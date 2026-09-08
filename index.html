@@ -313,6 +313,154 @@
 
     // Инициализация при загрузке
     renderMenu();
+<script>
+    // Курсы валют относительно KZT (при необходимости можно подправить)
+    const currencyConfig = {
+      en: { rate: 0.0021, symbol: "$" },
+      it: { rate: 0.0019, symbol: "€" },
+      zh: { rate: 0.015,  symbol: "¥" }
+    };
+
+    // Полная база данных меню
+    const menuData = [
+      // --- ЗАКУСКИ И САЛАТЫ ---
+      {
+        kzt: 4200,
+        ru: { title: "Салат Цезарь с креветками", desc: "Тигровые креветки, салат Романо, пармезан, соус Цезарь и крутоны" },
+        en: { title: "Caesar Salad with Prawns", desc: "Tiger prawns, Romaine lettuce, parmesan, Caesar dressing, and croutons" },
+        it: { title: "Insalata Caesar con Gamberi", desc: "Gamberi tigre, lattuga romana, parmigiano, salsa Caesar e crostini" },
+        zh: { title: "大虾凯撒沙拉", desc: "虎虾、罗马生菜、帕玛森芝士、凯撒酱和香脆面包干" }
+      },
+      {
+        kzt: 4500,
+        ru: { title: "Буррата с томатами и песто", desc: "Свежая буррата, спелые томаты, соус песто и соус бальзамик" },
+        en: { title: "Burrata with Tomatoes & Pesto", desc: "Fresh burrata, ripe tomatoes, homemade pesto, and balsamic glaze" },
+        it: { title: "Burrata con Pomodori e Pesto", desc: "Burrata fresca, pomodori maturi, pesto fatto in casa e glassa di balsamico" },
+        zh: { title: "布拉塔芝士配番茄罗勒酱", desc: "新鲜布拉塔芝士、熟番茄、自制罗勒酱和黑醋汁" }
+      },
+      {
+        kzt: 3800,
+        ru: { title: "Брускетта с лососем и авокадо", desc: "Хрустящий тартин, слабосоленый лосось, авокадо и сливочный сыр" },
+        en: { title: "Salmon & Avocado Bruschetta", desc: "Crispy tartine, cured salmon, avocado, and cream cheese" },
+        it: { title: "Bruschetta con Salmone e Avocado", desc: "Pane croccante, salmone marinato, avocado e formaggio spalmabile" },
+        zh: { title: "三文鱼牛油果意式烤面包", desc: "香脆面包片、腌制三文鱼、牛油果和奶油芝士" }
+      },
+
+      // --- ПАСТА И РИЗОТТО ---
+      {
+        kzt: 4800,
+        ru: { title: "Паста Карбонара", desc: "Классическая паста с панчеттой, пармезаном и яичным желтком" },
+        en: { title: "Pasta Carbonara", desc: "Classic pasta with pancetta, parmesan, and egg yolk" },
+        it: { title: "Pasta alla Carbonara", desc: "Pasta classica con pancetta, parmigiano e tuorlo d'uovo" },
+        zh: { title: "奶油培根面", desc: "经典意面，配意大利培根、帕玛森芝士和蛋黄" }
+      },
+      {
+        kzt: 5600,
+        ru: { title: "Тальятелле с морепродуктами", desc: "Паста с креветками, кальмарами и мидиями в соусе из томатов" },
+        en: { title: "Seafood Tagliatelle", desc: "Pasta with prawns, squid, and mussels in tomato wine sauce" },
+        it: { title: "Tagliatelle ai Frutti di Mare", desc: "Tagliatelle con gamberi, calamari e cozze in salsa di pomodoro" },
+        zh: { title: "海鲜宽面", desc: "配大虾、鱿鱼和青口贝的番茄葡萄酒汁意面" }
+      },
+
+      // --- ПИЦЦА ---
+      {
+        kzt: 5200,
+        ru: { title: "Пицца Маргарита с Бурратой", desc: "Томатный соус, свежая буррата, базилик и оливковое масло" },
+        en: { title: "Margherita Pizza with Burrata", desc: "Tomato sauce, fresh burrata, basil, and olive oil" },
+        it: { title: "Pizza Margherita con Burrata", desc: "Salsa di pomodoro, burrata fresca, basilico e olio d'oliva" },
+        zh: { title: "玛格丽特布拉塔比萨", desc: "番茄酱、新鲜布拉塔芝士、罗勒和橄榄油" }
+      },
+      {
+        kzt: 5800,
+        ru: { title: "Пицца Пепперони", desc: "Острая пепперони, моцарелла, томатный соус и орегано" },
+        en: { title: "Pepperoni Pizza", desc: "Spicy pepperoni, mozzarella, tomato sauce, and oregano" },
+        it: { title: "Pizza Diavola (Pepperoni)", desc: "Salame piccante, mozzarella, salsa di pomodoro e origano" },
+        zh: { title: "意式香肠辣比萨", desc: "美式辣牛肉香肠、马苏里拉芝士和番茄酱" }
+      },
+
+      // --- ГОРЯЧИЕ БЛЮДА ---
+      {
+        kzt: 8500,
+        ru: { title: "Стейк Рибай", desc: "Сочный стейк из мраморной говядины с овощами гриль" },
+        en: { title: "Ribeye Steak", desc: "Juicy marbled beef steak served with grilled vegetables" },
+        it: { title: "Bistecca Ribeye", desc: "Succosa bistecca di manzo marezzato con verdure alla griglia" },
+        zh: { title: "肋眼牛排", desc: "多汁大理石纹牛排，配烤蔬菜" }
+      },
+      {
+        kzt: 6900,
+        ru: { title: "Лосось на гриле", desc: "Филе лосося с соусом тар-тар и спаржей" },
+        en: { title: "Grilled Salmon", desc: "Salmon fillet with tartar sauce and green asparagus" },
+        it: { title: "Salmone alla Griglia", desc: "Filetto di salmone con salsa tartara e asparagi" },
+        zh: { title: "香烤三文鱼", desc: "三文鱼排配塔塔酱和鲜芦笋" }
+      },
+
+      // --- ДЕСЕРТЫ ---
+      {
+        kzt: 3500,
+        ru: { title: "Тирамису Классический", desc: "Традиционный итальянский десерт с маскарпоне и кофе" },
+        en: { title: "Classic Tiramisu", desc: "Traditional Italian dessert with mascarpone and espresso" },
+        it: { title: "Tiramisu Classico", desc: "Dolce tradizionale italiano con mascarpone e caffe" },
+        zh: { title: "经典提拉米苏", desc: "传统的意大利甜点，配马斯卡彭芝士和咖啡" }
+      },
+      {
+        kzt: 3200,
+        ru: { title: "Фисташковый Чизкейк", desc: "Нежный сырный десерт с фисташковым кремом" },
+        en: { title: "Pistachio Cheesecake", desc: "Delicate cheesecake topped with pistachio cream" },
+        it: { title: "Cheesecake al Pistacchio", desc: "Deliziosa cheesecake con crema al pistacchio" },
+        zh: { title: "开心果芝士蛋糕", desc: "细腻的芝士蛋糕，配开心果奶油" }
+      },
+
+      // --- НАПИТКИ ---
+      {
+        kzt: 2800,
+        ru: { title: "Авторский Лимонад Маракуйя", desc: "Свежая маракуйя, мята, содовая и цитрусовый сок" },
+        en: { title: "Signature Passion Fruit Lemonade", desc: "Fresh passion fruit, mint, soda, and citrus juice" },
+        it: { title: "Limonata al Frutto della Passione", desc: "Frutto della passione fresco, menta, soda e agrumi" },
+        zh: { title: "招牌百香果汽水", desc: "新鲜百香果、薄荷、苏打水和柑橘汁" }
+      },
+      {
+        kzt: 1800,
+        ru: { title: "Эспрессо / Кофе", desc: "Свежесваренный итальянский кофе" },
+        en: { title: "Espresso / Coffee", desc: "Freshly brewed premium Italian coffee" },
+        it: { title: "Caffe Espresso", desc: "Caffe espresso italiano premium" },
+        zh: { title: "意式浓缩 / 咖啡", desc: "现磨优质意大利咖啡" }
+      }
+    ];
+
+    let currentLang = 'en';
+
+    function renderMenu() {
+      const container = document.getElementById('menu-items');
+      const config = currencyConfig[currentLang];
+      
+      container.innerHTML = menuData.map(item => {
+        const foreignPrice = (item.kzt * config.rate).toFixed(2);
+        const langData = item[currentLang];
+
+        return `
+          <div class="menu-item">
+            <div class="item-info">
+              <span class="title-translated">${langData.title}</span>
+              <span class="title-ru">${item.ru.title}</span>
+              <p class="desc-translated">${langData.desc}</p>
+              <p class="desc-ru">${item.ru.desc}</p>
+            </div>
+            <div class="price-box">
+              <span class="price-foreign">${config.symbol} ${foreignPrice}</span>
+              <span class="price-kzt">${item.kzt.toLocaleString()} ₸</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderMenu();
+    }
+
+    // Первоначальный вывод меню
+    renderMenu();
   </script>
-</body>
-</html>
