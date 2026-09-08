@@ -12,9 +12,6 @@
       --card-bg: rgba(26, 23, 24, 0.85);
       --text-light: #f5f5f5;
       --text-muted: #aaa;
-      --rate-usd: 0.0021; /* 1 KZT = 0.0021 USD */
-      --rate-eur: 0.0019; /* 1 KZT = 0.0019 EUR */
-      --rate-cny: 0.015;  /* 1 KZT = 0.015 CNY */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -49,7 +46,7 @@
       50% { transform: translateY(-15px) rotate(5deg); }
     }
 
-    /* Главный баннер с фото */
+    /* Главный баннер с фото на фоне */
     .hero {
       height: 100vh;
       background: linear-gradient(to bottom, rgba(15, 13, 14, 0.4), var(--bg-dark)), url('bg-hero.jpg') center/cover no-repeat;
@@ -141,7 +138,6 @@
       justify-content: space-between;
       align-items: center;
       transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
     }
 
     .menu-item:hover {
@@ -150,7 +146,7 @@
       box-shadow: 0 8px 25px rgba(212, 175, 55, 0.15);
     }
 
-    /* Стилизация текста перевода (крупнее) и русского (меньше) */
+    /* Иерархия текста: перевод крупнее, русский меньше */
     .title-translated {
       font-size: 1.4rem;
       font-weight: 700;
@@ -208,25 +204,19 @@
 
   <!-- Рисунки блюд/напитков слева -->
   <div class="side-decor left">
-    <!-- Пицца -->
     <svg class="decor-icon" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 5.5l5.5 11h-11L12 7.5zM9.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
-    <!-- Бокал вина -->
     <svg class="decor-icon" viewBox="0 0 24 24"><path d="M6 3v6c0 2.97 2.16 5.43 5 5.91V19H8v2h8v-2h-3v-4.09c2.84-.48 5-2.94 5-5.91V3H6zm10 5H8V5h8v3z"/></svg>
-    <!-- Паста / Тарелка -->
     <svg class="decor-icon" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.55 3.89 3.57 4.23V22h2.86v-8.77C11.45 12.89 13 11.12 13 9V2h-2v7zm8-7v8h2V2h-2zm0 10v10h2V12h-2z"/></svg>
   </div>
 
   <!-- Рисунки блюд/напитков справа -->
   <div class="side-decor right">
-    <!-- Коктейль -->
     <svg class="decor-icon" viewBox="0 0 24 24"><path d="M7.5 7l-2.7-3h14.4l-2.7 3H7.5zM3 3l6.5 7.22V19H6v2h12v-2h-3.5v-8.78L21 3H3z"/></svg>
-    <!-- Бургер / Блюдо -->
     <svg class="decor-icon" viewBox="0 0 24 24"><path d="M12 4C7.03 4 3 7.03 3 11h18c0-3.97-4.03-7-9-7zm-9 9v2h18v-2H3zm0 4c0 1.66 1.34 3 3 3h12c1.66 0 3-1.34 3-3H3z"/></svg>
-    <!-- Кофейная чашка -->
     <svg class="decor-icon" viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3z"/></svg>
   </div>
 
-  <!-- Главная страница с вашим фото на фоне -->
+  <!-- Главный экран с фоновым фото -->
   <section class="hero">
     <h1 class="hero-title">Al Ponte</h1>
     <div class="hero-subtitle">RESTAURANT & LOUNGE</div>
@@ -235,95 +225,22 @@
 
   <!-- Выбор языка -->
   <div class="lang-picker" id="menu">
-    <button class="lang-btn active" onclick="setLanguage('en')">English (USD)</button>
-    <button class="lang-btn" onclick="setLanguage('it')">Italiano (EUR)</button>
-    <button class="lang-btn" onclick="setLanguage('zh')">中文 (CNY)</button>
+    <button class="lang-btn active" onclick="setLanguage('en', event)">English (USD)</button>
+    <button class="lang-btn" onclick="setLanguage('it', event)">Italiano (EUR)</button>
+    <button class="lang-btn" onclick="setLanguage('zh', event)">中文 (CNY)</button>
   </div>
 
-  <!-- Список блюд -->
-  <div class="menu-container" id="menu-items">
-    <!-- Элементы создаются автоматически через JavaScript -->
-  </div>
+  <!-- Список меню -->
+  <div class="menu-container" id="menu-items"></div>
 
   <script>
-    // База данных блюд
-    const menuData = [
-      {
-        kzt: 4800,
-        ru: { title: "Паста Карбонара", desc: "Классическая паста с панчеттой, пармезаном и яичным желтком" },
-        en: { title: "Pasta Carbonara", desc: "Classic pasta with pancetta, parmesan, and egg yolk" },
-        it: { title: "Pasta alla Carbonara", desc: "Pasta classica con pancetta, parmigiano e tuorlo d'uovo" },
-        zh: { title: "奶油培根面", desc: "经典意面，配意大利培根、帕玛森芝士和蛋黄" }
-      },
-      {
-        kzt: 5200,
-        ru: { title: "Пицца Маргарита с Бурратой", desc: "Томатный соус, свежая буррата, базилик и оливковое масло" },
-        en: { title: "Margherita Pizza with Burrata", desc: "Tomato sauce, fresh burrata, basil, and olive oil" },
-        it: { title: "Pizza Margherita con Burrata", desc: "Salsa di pomodoro, burrata fresca, basilico e olio d'oliva" },
-        zh: { title: "玛格丽特布拉塔比萨", desc: "番茄酱、新鲜布拉塔芝士、罗勒和橄榄油" }
-      },
-      {
-        kzt: 3500,
-        ru: { title: "Тирамису Классический", desc: "Традиционный итальянский десерт с маскарпоне и кофе" },
-        en: { title: "Classic Tiramisu", desc: "Traditional Italian dessert with mascarpone and espresso" },
-        it: { title: "Tiramisu Classico", desc: "Dolce tradizionale italiano con mascarpone e caffe" },
-        zh: { title: "经典提拉米苏", desc: "传统的意大利甜点，配马斯卡彭芝士和咖啡" }
-      }
-    ];
-
     const currencyConfig = {
       en: { rate: 0.0021, symbol: "$" },
       it: { rate: 0.0019, symbol: "€" },
       zh: { rate: 0.015,  symbol: "¥" }
     };
 
-    let currentLang = 'en';
-
-    function renderMenu() {
-      const container = document.getElementById('menu-items');
-      const config = currencyConfig[currentLang];
-      
-      container.innerHTML = menuData.map(item => {
-        const foreignPrice = (item.kzt * config.rate).toFixed(2);
-        const langData = item[currentLang];
-
-        return `
-          <div class="menu-item">
-            <div class="item-info">
-              <span class="title-translated">${langData.title}</span>
-              <span class="title-ru">${item.ru.title}</span>
-              <p class="desc-translated">${langData.desc}</p>
-              <p class="desc-ru">${item.ru.desc}</p>
-            </div>
-            <div class="price-box">
-              <span class="price-foreign">${config.symbol} ${foreignPrice}</span>
-              <span class="price-kzt">${item.kzt.toLocaleString()} ₸</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      renderMenu();
-    }
-
-    // Инициализация при загрузке
-    renderMenu();
-<script>
-    // Курсы валют относительно KZT (при необходимости можно подправить)
-    const currencyConfig = {
-      en: { rate: 0.0021, symbol: "$" },
-      it: { rate: 0.0019, symbol: "€" },
-      zh: { rate: 0.015,  symbol: "¥" }
-    };
-
-    // Полная база данных меню
     const menuData = [
-      // --- ЗАКУСКИ И САЛАТЫ ---
       {
         kzt: 4200,
         ru: { title: "Салат Цезарь с креветками", desc: "Тигровые креветки, салат Романо, пармезан, соус Цезарь и крутоны" },
@@ -345,8 +262,6 @@
         it: { title: "Bruschetta con Salmone e Avocado", desc: "Pane croccante, salmone marinato, avocado e formaggio spalmabile" },
         zh: { title: "三文鱼牛油果意式烤面包", desc: "香脆面包片、腌制三文鱼、牛油果和奶油芝士" }
       },
-
-      // --- ПАСТА И РИЗОТТО ---
       {
         kzt: 4800,
         ru: { title: "Паста Карбонара", desc: "Классическая паста с панчеттой, пармезаном и яичным желтком" },
@@ -361,8 +276,6 @@
         it: { title: "Tagliatelle ai Frutti di Mare", desc: "Tagliatelle con gamberi, calamari e cozze in salsa di pomodoro" },
         zh: { title: "海鲜宽面", desc: "配大虾、鱿鱼和青口贝的番茄葡萄酒汁意面" }
       },
-
-      // --- ПИЦЦА ---
       {
         kzt: 5200,
         ru: { title: "Пицца Маргарита с Бурратой", desc: "Томатный соус, свежая буррата, базилик и оливковое масло" },
@@ -377,8 +290,6 @@
         it: { title: "Pizza Diavola (Pepperoni)", desc: "Salame piccante, mozzarella, salsa di pomodoro e origano" },
         zh: { title: "意式香肠辣比萨", desc: "美式辣牛肉香肠、马苏里拉芝士和番茄酱" }
       },
-
-      // --- ГОРЯЧИЕ БЛЮДА ---
       {
         kzt: 8500,
         ru: { title: "Стейк Рибай", desc: "Сочный стейк из мраморной говядины с овощами гриль" },
@@ -393,8 +304,6 @@
         it: { title: "Salmone alla Griglia", desc: "Filetto di salmone con salsa tartara e asparagi" },
         zh: { title: "香烤三文鱼", desc: "三文鱼排配塔塔酱和鲜芦笋" }
       },
-
-      // --- ДЕСЕРТЫ ---
       {
         kzt: 3500,
         ru: { title: "Тирамису Классический", desc: "Традиционный итальянский десерт с маскарпоне и кофе" },
@@ -406,11 +315,9 @@
         kzt: 3200,
         ru: { title: "Фисташковый Чизкейк", desc: "Нежный сырный десерт с фисташковым кремом" },
         en: { title: "Pistachio Cheesecake", desc: "Delicate cheesecake topped with pistachio cream" },
-        it: { title: "Cheesecake al Pistacchio", desc: "Deliziosa cheesecake con crema al pistacchio" },
+        it: { title: "Pistachio Cheesecake", desc: "Deliziosa cheesecake con crema al pistacchio" },
         zh: { title: "开心果芝士蛋糕", desc: "细腻的芝士蛋糕，配开心果奶油" }
       },
-
-      // --- НАПИТКИ ---
       {
         kzt: 2800,
         ru: { title: "Авторский Лимонад Маракуйя", desc: "Свежая маракуйя, мята, содовая и цитрусовый сок" },
@@ -454,13 +361,16 @@
       }).join('');
     }
 
-    function setLanguage(lang) {
+    function setLanguage(lang, evt) {
       currentLang = lang;
       document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
       renderMenu();
     }
 
-    // Первоначальный вывод меню
     renderMenu();
   </script>
+</body>
+</html>
