@@ -3,646 +3,316 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al'Ponte — Menu & Bar</title>
+  <title>Al Ponte Restaurant & Lounge — Меню</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Georgia", "Times New Roman", serif;
+    :root {
+      --primary: #d4af37;
+      --primary-neon: #e10098;
+      --bg-dark: #0f0d0e;
+      --card-bg: rgba(26, 23, 24, 0.85);
+      --text-light: #f5f5f5;
+      --text-muted: #aaa;
+      --rate-usd: 0.0021; /* 1 KZT = 0.0021 USD */
+      --rate-eur: 0.0019; /* 1 KZT = 0.0019 EUR */
+      --rate-cny: 0.015;  /* 1 KZT = 0.015 CNY */
     }
 
-    body {
-      background-color: #0f0b13;
-      color: #2b2b2b;
-      display: flex;
-      justify-content: center;
-      padding: 20px 10px;
-      min-height: 100vh;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-light); overflow-x: hidden; position: relative; }
 
-    #lang-modal {
+    /* Декоративные рисунки по бокам */
+    .side-decor {
       position: fixed;
-      inset: 0;
-      background: rgba(15, 11, 19, 0.96);
+      top: 0;
+      width: 140px;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.25;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .side-decor.left { left: 10px; }
+    .side-decor.right { right: 10px; }
+    .decor-icon {
+      width: 70px;
+      height: 70px;
+      fill: var(--primary);
+      animation: float 6s ease-in-out infinite;
+    }
+    .side-decor.right .decor-icon { animation-delay: 3s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    /* Главный баннер с фото */
+    .hero {
+      height: 100vh;
+      background: linear-gradient(to bottom, rgba(15, 13, 14, 0.4), var(--bg-dark)), url('bg-hero.jpg') center/cover no-repeat;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 2000;
-      padding: 20px;
-    }
-
-    .lang-card {
-      background: #1a1222;
-      padding: 40px 30px;
-      border-radius: 8px;
       text-align: center;
-      max-width: 420px;
-      width: 100%;
-      box-shadow: 0 0 25px rgba(224, 30, 132, 0.3);
-      border: 1px solid #e01e84;
-      color: #fff;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
     }
 
-    .lang-card h2 {
-      font-size: 22px;
+    .hero-title {
+      font-size: 3.2rem;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(225, 0, 152, 0.8), 0 0 30px rgba(225, 0, 152, 0.5);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-bottom: 30px;
       letter-spacing: 2px;
-      margin-bottom: 25px;
-      text-transform: uppercase;
-      color: #e01e84;
-      border-bottom: 1px solid #e01e84;
-      padding-bottom: 10px;
+    }
+
+    .btn-menu {
+      padding: 15px 35px;
+      font-size: 1.2rem;
+      background: linear-gradient(45deg, var(--primary-neon), var(--primary));
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(225, 0, 152, 0.4);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    .btn-menu:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(225, 0, 152, 0.7); }
+
+    /* Переключатель языка */
+    .lang-picker {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 13, 14, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      z-index: 100;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
     }
 
     .lang-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
       background: transparent;
-      border: 1px solid #e01e84;
-      color: #fff;
-      font-size: 15px;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 8px 18px;
+      border-radius: 20px;
       cursor: pointer;
-      border-radius: 4px;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .lang-btn:hover {
-      background: #e01e84;
-      color: #fff;
-      box-shadow: 0 0 10px #e01e84;
-    }
-
-    .menu-page {
-      background-color: #fcf9f5;
-      width: 100%;
-      max-width: 950px;
-      padding: 40px 30px;
-      box-shadow: 0 0 30px rgba(224, 30, 132, 0.2);
-      border-radius: 6px;
-      border: 1px solid #3d1c47;
-      display: none;
-    }
-
-    .header-brand {
-      text-align: center;
-      margin-bottom: 25px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #2d1236;
-    }
-
-    .brand-title {
-      font-size: 38px;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: #2d1236;
-      text-shadow: 0 0 1px #e01e84;
       font-weight: bold;
+      transition: 0.3s;
+    }
+    .lang-btn.active, .lang-btn:hover {
+      background: var(--primary);
+      color: #000;
     }
 
-    .brand-subtitle {
-      font-size: 13px;
-      letter-spacing: 3px;
-      color: #f26522;
-      text-transform: uppercase;
-      margin-top: -5px;
-      margin-bottom: 15px;
+    /* Контейнер меню */
+    .menu-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
     }
 
-    .info-block {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 15px;
-      font-size: 12px;
-      color: #4a3850;
-      background: #f3ebf5;
-      padding: 15px;
-      border-radius: 5px;
-      border-left: 4px solid #e01e84;
-    }
-
-    .branches {
-      flex: 2;
-      min-width: 250px;
-    }
-
-    .branches div {
-      margin-bottom: 3px;
-    }
-
-    .contacts {
-      flex: 1;
-      min-width: 180px;
-      text-align: right;
-    }
-
-    .contacts a {
-      color: #2d1236;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .top-nav {
+    /* Карточка блюда */
+    .menu-item {
+      background: var(--card-bg);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #e01e84;
-      padding-bottom: 10px;
-      margin-top: 25px;
-      margin-bottom: 30px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 20px;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      font-size: 26px;
-      font-weight: bold;
-      letter-spacing: 4px;
-      text-transform: uppercase;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
-      color: #937d9b;
-      padding-bottom: 5px;
-      transition: color 0.3s;
     }
 
-    .tab-btn.active {
-      color: #2d1236;
-      border-bottom: 3px solid #e01e84;
+    .menu-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 25px rgba(212, 175, 55, 0.15);
     }
 
-    .change-lang-link {
-      background: #2d1236;
+    /* Стилизация текста перевода (крупнее) и русского (меньше) */
+    .title-translated {
+      font-size: 1.4rem;
+      font-weight: 700;
       color: #fff;
-      border: none;
-      padding: 6px 14px;
-      font-size: 12px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-radius: 3px;
-      transition: background 0.3s;
-    }
-
-    .change-lang-link:hover {
-      background: #e01e84;
-    }
-
-    .menu-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px 25px;
-    }
-
-    .category {
-      break-inside: avoid;
-    }
-
-    .category-title {
-      font-size: 17px;
-      font-weight: normal;
-      text-align: center;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 15px;
-      padding-bottom: 4px;
-      color: #2d1236;
-      border-bottom: 1px solid #2d1236;
-      position: relative;
-    }
-
-    .category-title::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background: #e01e84;
-    }
-
-    .menu-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-      font-size: 13px;
-      line-height: 1.2;
-    }
-
-    .item-names {
-      padding-right: 10px;
-    }
-
-    .name-ru {
-      font-weight: bold;
-      color: #1a1a1a;
-      font-size: 13px;
-    }
-
-    .name-translated {
       display: block;
-      font-style: italic;
-      color: #6a5373;
-      font-size: 12px;
-      margin-top: 2px;
-      font-family: -apple-system, sans-serif;
+      margin-bottom: 4px;
     }
 
-    .item-price {
-      font-weight: bold;
-      white-space: nowrap;
-      font-size: 13px;
-      color: #2d1236;
+    .title-ru {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 8px;
     }
 
-    .footer-note {
-      text-align: center;
-      margin-top: 40px;
-      padding-top: 15px;
-      border-top: 1px solid #d8c2df;
-      font-size: 12px;
-      color: #584163;
+    .desc-translated {
+      font-size: 1.05rem;
+      color: #ddd;
     }
 
-    .tab-content {
-      display: none;
+    .desc-ru {
+      font-size: 0.85rem;
+      color: #888;
     }
 
-    .tab-content.active {
+    /* Блок цен */
+    .price-box {
+      text-align: right;
+      min-width: 130px;
+    }
+
+    .price-kzt {
+      font-size: 1.1rem;
+      color: var(--text-muted);
       display: block;
     }
 
+    .price-foreign {
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: var(--primary);
+      display: block;
+    }
+
+    /* Адаптивность для мобильных */
     @media (max-width: 768px) {
-      .menu-grid {
-        grid-template-columns: 1fr;
-      }
-      .tab-btn {
-        font-size: 20px;
-      }
-      .menu-page {
-        padding: 20px 15px;
-      }
-      .contacts {
-        text-align: left;
-      }
+      .side-decor { display: none; }
+      .hero-title { font-size: 2.2rem; }
+      .menu-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .price-box { text-align: left; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Выбор языка -->
-  <div id="lang-modal">
-    <div class="lang-card">
-      <h2>Al'Ponte</h2>
-      <p style="margin-bottom: 15px; font-size: 13px; color: #ccc;">Select Language / Выберите язык</p>
-      <button class="lang-btn" onclick="setLanguage('en')">English</button>
-      <button class="lang-btn" onclick="setLanguage('tr')">Türkçe</button>
-      <button class="lang-btn" onclick="setLanguage('hi')">हिन्दी (Hindi)</button>
-      <button class="lang-btn" onclick="setLanguage('de')">Deutsch</button>
-    </div>
+  <!-- Рисунки блюд/напитков слева -->
+  <div class="side-decor left">
+    <!-- Пицца -->
+    <svg class="decor-icon" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 5.5l5.5 11h-11L12 7.5zM9.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+    <!-- Бокал вина -->
+    <svg class="decor-icon" viewBox="0 0 24 24"><path d="M6 3v6c0 2.97 2.16 5.43 5 5.91V19H8v2h8v-2h-3v-4.09c2.84-.48 5-2.94 5-5.91V3H6zm10 5H8V5h8v3z"/></svg>
+    <!-- Паста / Тарелка -->
+    <svg class="decor-icon" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.55 3.89 3.57 4.23V22h2.86v-8.77C11.45 12.89 13 11.12 13 9V2h-2v7zm8-7v8h2V2h-2zm0 10v10h2V12h-2z"/></svg>
   </div>
 
-  <!-- Главное меню -->
-  <div class="menu-page" id="menu-page">
-    
-    <div class="header-brand">
-      <div class="brand-title">AL'PONTE</div>
-      <div class="brand-subtitle">Restaurant & Lounge</div>
-      
-      <div class="info-block">
-        <div class="branches">
-          <div><strong>Ресторан Al'Ponte:</strong> ул. Сагадат Нурмагамбетова, 78</div>
-          <div><strong>Кофейня Al'Ponte:</strong> ул. Кожамкулова, 213</div>
-          <div><strong>Кофейня Olivka Coffee:</strong> ул. Байтурсынова, 54</div>
-        </div>
-        <div class="contacts">
-          <div>Тел / WhatsApp:</div>
-          <a href="tel:87018929830">8 (701) 892-98-30</a>
-        </div>
-      </div>
-    </div>
+  <!-- Рисунки блюд/напитков справа -->
+  <div class="side-decor right">
+    <!-- Коктейль -->
+    <svg class="decor-icon" viewBox="0 0 24 24"><path d="M7.5 7l-2.7-3h14.4l-2.7 3H7.5zM3 3l6.5 7.22V19H6v2h12v-2h-3.5v-8.78L21 3H3z"/></svg>
+    <!-- Бургер / Блюдо -->
+    <svg class="decor-icon" viewBox="0 0 24 24"><path d="M12 4C7.03 4 3 7.03 3 11h18c0-3.97-4.03-7-9-7zm-9 9v2h18v-2H3zm0 4c0 1.66 1.34 3 3 3h12c1.66 0 3-1.34 3-3H3z"/></svg>
+    <!-- Кофейная чашка -->
+    <svg class="decor-icon" viewBox="0 0 24 24"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3z"/></svg>
+  </div>
 
-    <div class="top-nav">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('food')">MENU</button>
-        <button class="tab-btn" onclick="switchTab('bar')">BAR</button>
-      </div>
-      <button class="change-lang-link" onclick="resetLanguage()">🌐 Язык</button>
-    </div>
+  <!-- Главная страница с вашим фото на фоне -->
+  <section class="hero">
+    <h1 class="hero-title">Al Ponte</h1>
+    <div class="hero-subtitle">RESTAURANT & LOUNGE</div>
+    <a href="#menu" class="btn-menu">Посмотреть Меню</a>
+  </section>
 
-    <!-- Вкладка МЕНЮ -->
-    <div id="tab-food" class="tab-content active">
-      <div class="menu-grid">
+  <!-- Выбор языка -->
+  <div class="lang-picker" id="menu">
+    <button class="lang-btn active" onclick="setLanguage('en')">English (USD)</button>
+    <button class="lang-btn" onclick="setLanguage('it')">Italiano (EUR)</button>
+    <button class="lang-btn" onclick="setLanguage('zh')">中文 (CNY)</button>
+  </div>
 
-        <!-- ЗАВТРАКИ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Завтраки" data-en="Breakfasts" data-tr="Kahvaltılar" data-hi="नाश्ता" data-de="Frühstück">Завтраки</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Каша</span><span class="name-translated" data-en="Porridge" data-tr="Yulaf Lapası" data-hi="दलिया" data-de="Haferbrei"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Глазунья</span><span class="name-translated" data-en="Fried eggs" data-tr="Sahanda Yumurta" data-hi="हाफ फ्राई" data-de="Spiegeleier"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Омлет/скрэмбл</span><span class="name-translated" data-en="Omelette/Scramble" data-tr="Omlet/Scramble" data-hi="ऑमलेट/स्क्रैम्बल" data-de="Rührei/Omelett"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Омлет с сыром</span><span class="name-translated" data-en="Cheese omelette" data-tr="Peynirli Omlet" data-hi="चीज़ ऑमलेट" data-de="Käse-Omelett"></span></div><span class="item-price">1 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Шакшука</span><span class="name-translated" data-en="Shakshuka" data-tr="Şakşuka" data-hi="शकशूका" data-de="Schakshuka"></span></div><span class="item-price">2 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Английский завтрак</span><span class="name-translated" data-en="English breakfast" data-tr="İngiliz kahvaltısı" data-hi="इंग्लिश ब्रेकफास्ट" data-de="Englisches Frühstück"></span></div><span class="item-price">2 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Казахский завтрак</span><span class="name-translated" data-en="Kazakh breakfast" data-tr="Kazak kahvaltısı" data-hi="कज़ाख नाश्ता" data-de="Kasachisches Frühstück"></span></div><span class="item-price">3 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Скрэмбл с лососем и авокадо</span><span class="name-translated" data-en="Salmon & avocado scramble" data-tr="Somonlu avokadolu scramble" data-hi="सामन और एवोकैडो स्क्रैम्बल" data-de="Rührei mit Lachs & Avocado"></span></div><span class="item-price">3 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Брускетта с лососем и яйцом пашот</span><span class="name-translated" data-en="Salmon & poached egg bruschetta" data-tr="Somonlu poşe yumurtalı bruschetta" data-hi="सामन ब्रशचेट्टा" data-de="Lachs-Pochiertes Ei-Bruschetta"></span></div><span class="item-price">3 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Блины с курицей и грибами (2шт)</span><span class="name-translated" data-en="Pancakes with chicken & mushrooms" data-tr="Tavuklu mantarlı krep" data-hi="चिकन और मशरूम पेनकेक्स" data-de="Pfannkuchen mit Hähnchen & Pilzen"></span></div><span class="item-price">2 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Гречка с курицей, грибами и яйцом пашот</span><span class="name-translated" data-en="Buckwheat with chicken & poached egg" data-tr="Tavuklu poşe yumurtalı karabuğday" data-hi="कुट्टू और चिकन" data-de="Buchweizen mit Hähnchen & Ei"></span></div><span class="item-price">3 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Творог со сметаной</span><span class="name-translated" data-en="Cottage cheese with sour cream" data-tr="Ekşi kremalı süzme peynir" data-hi="कॉटेज चीज़ मलाई के साथ" data-de="Quark mit Sauerrahm"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Творог с йогуртом и голубикой</span><span class="name-translated" data-en="Cottage cheese with yogurt & blueberries" data-tr="Yoğurtlu yaban mersinli süzme peynir" data-hi="दही और ब्लूबेरी कॉटेज चीज़" data-de="Quark mit Joghurt & Blaubeeren"></span></div><span class="item-price">1 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Блинчики с творогом</span><span class="name-translated" data-en="Cottage cheese pancakes" data-tr="Süzme peynirli krep" data-hi="कॉटेज चीज़ पेनकेक्स" data-de="Pfannkuchen mit Quark"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Сырники со сметаной (3шт)</span><span class="name-translated" data-en="Syrniki with sour cream (3pcs)" data-tr="Ekşi kremalı Syrniki (3 adet)" data-hi="सिरनिकी (3 पीस)" data-de="Quarkkeulchen (3 Stk.)"></span></div><span class="item-price">2 100тг</span></div>
-        </div>
-
-        <!-- САЛАТЫ И СУПЫ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Салаты и Супы" data-en="Salads & Soups" data-tr="Salatalar ve Çorbalar" data-hi="सलाद और सूप" data-de="Salate & Suppen">Салаты и Супы</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Салат свежий</span><span class="name-translated" data-en="Fresh salad" data-tr="Taze salata" data-hi="ताज़ा सलाद" data-de="Frischer Salat"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Салат капрезе</span><span class="name-translated" data-en="Caprese salad" data-tr="Caprese salatası" data-hi="काप्रेसे सलाद" data-de="Caprese-Salat"></span></div><span class="item-price">2 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Салат греческий</span><span class="name-translated" data-en="Greek salad" data-tr="Yunan salatası" data-hi="ग्रीक सलाद" data-de="Griechischer Salat"></span></div><span class="item-price">2 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Цезарь с курицей</span><span class="name-translated" data-en="Chicken Caesar" data-tr="Tavuklu Sezar" data-hi="चिकन सीज़र" data-de="Chicken Caesar"></span></div><span class="item-price">3 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Цезарь с креветками</span><span class="name-translated" data-en="Shrimp Caesar" data-tr="Karidesli Sezar" data-hi="झींगा सीज़र" data-de="Garnelen Caesar"></span></div><span class="item-price">3 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Салат с жареным баклажаном</span><span class="name-translated" data-en="Fried eggplant salad" data-tr="Kızartılmış patlıcan salatası" data-hi="बैंगन सलाद" data-de="Auberginensalat"></span></div><span class="item-price">3 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Салат тропик</span><span class="name-translated" data-en="Tropic salad" data-tr="Tropik salata" data-hi="ट्रोपिक सलाद" data-de="Tropischer Salat"></span></div><span class="item-price">3 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Салат с бураттой и томатами</span><span class="name-translated" data-en="Burrata & tomato salad" data-tr="Burrata ve domates salatası" data-hi="बुराटा और टमाटर" data-de="Burrata-Tomaten-Salat"></span></div><span class="item-price">3 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Теплый салат с телятиной</span><span class="name-translated" data-en="Warm veal salad" data-tr="Sıcak dana etli salata" data-hi="गर्म बछड़े का मांस सलाद" data-de="Warmer Kalbfleischsalat"></span></div><span class="item-price">3 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Лапша по-домашнему</span><span class="name-translated" data-en="Homemade noodle soup" data-tr="Ev yapımı erişte çorbası" data-hi="होममेड नूडल सूप" data-de="Hausgemachte Nudelsuppe"></span></div><span class="item-price">1 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Чечевичный крем-суп</span><span class="name-translated" data-en="Lentil cream soup" data-tr="Mercimek çorbası" data-hi="मसूर की दाल का सूप" data-de="Linsensuppe"></span></div><span class="item-price">1 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Окрошка мясная</span><span class="name-translated" data-en="Meat Okroshka" data-tr="Etli Okroşka" data-hi="अक्रोश्का सूप" data-de="Fleisch-Okroschka"></span></div><span class="item-price">1 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Борщ</span><span class="name-translated" data-en="Borsch" data-tr="Borç çorbası" data-hi="बोर्श" data-de="Borschtsch"></span></div><span class="item-price">1 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пельмени с/без бульона</span><span class="name-translated" data-en="Pelmeni dumplings" data-tr="Mantı" data-hi="डंपलिंग" data-de="Pelmeni"></span></div><span class="item-price">2 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Рамен курица/говядина</span><span class="name-translated" data-en="Chicken/Beef Ramen" data-tr="Tavuklu/Etli Ramen" data-hi="रामेन" data-de="Ramen Hähnchen/Rind"></span></div><span class="item-price">2 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Солянка</span><span class="name-translated" data-en="Solyanka soup" data-tr="Solyanka çorbası" data-hi="सोल्यंका" data-de="Soljanka"></span></div><span class="item-price">3 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Том ям</span><span class="name-translated" data-en="Tom Yum" data-tr="Tom Yum" data-hi="टॉम यम" data-de="Tom Yam"></span></div><span class="item-price">3 800тг</span></div>
-        </div>
-
-        <!-- ГОРЯЧИЕ БЛЮДА -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Горячие блюда" data-en="Main Courses" data-tr="Ana Yemekler" data-hi="मुख्य व्यंजन" data-de="Hauptspeisen">Горячие блюда</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Лагман цомян/гуйру</span><span class="name-translated" data-en="Lagman Tsomyan/Guiru" data-tr="Lagman" data-hi="लगमान" data-de="Lagman"></span></div><span class="item-price">3 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Котлеты из говядины с пюре</span><span class="name-translated" data-en="Beef cutlets with mashed potatoes" data-tr="Köfte ve patates püresi" data-hi="बीफ कटलेट" data-de="Rinderfrikadellen mit Püree"></span></div><span class="item-price">4 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Бефстроганов с рисом</span><span class="name-translated" data-en="Beef stroganoff with rice" data-tr="Pirinçli Beef Stroganoff" data-hi="बीफ स्ट्रोगानॉफ" data-de="Beef Stroganoff mit Reis"></span></div><span class="item-price">5 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Казан-кебаб</span><span class="name-translated" data-en="Kazan Kebab" data-tr="Kazan Kebabı" data-hi="कज़ान कबाब" data-de="Kasan Kebab"></span></div><span class="item-price">5 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Жульен в горшочке</span><span class="name-translated" data-en="Pot Julienne" data-tr="Güveçte Julyen" data-hi="जूलियन सूप" data-de="Julienne im Topf"></span></div><span class="item-price">4 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Жареный картофель с мясом</span><span class="name-translated" data-en="Fried potatoes with meat" data-tr="Etli kızarmış patates" data-hi="आलू और मांस" data-de="Bratkartoffeln mit Fleisch"></span></div><span class="item-price">4 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Шампиньоны фаршированные</span><span class="name-translated" data-en="Stuffed mushrooms" data-tr="Peynirli dolma mantar" data-hi="भरवां मशरूम" data-de="Gefüllte Champignons"></span></div><span class="item-price">4 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Бешбармак</span><span class="name-translated" data-en="Beshbarmak" data-tr="Beşparmak" data-hi="बेशबारमक" data-de="Beschbarmak"></span></div><span class="item-price">5 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Стейк ти-бон / рибай</span><span class="name-translated" data-en="T-Bone / Ribeye Steak" data-tr="T-Bone / Antrikot" data-hi="टी-बोन / रिबाई स्टेक" data-de="T-Bone / Ribeye Steak"></span></div><span class="item-price">7 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Антрекот из конины</span><span class="name-translated" data-en="Horsemeat entrecote" data-tr="At eti antrikot" data-hi="एंट्रेकोट" data-de="Pferde-Entrecôte"></span></div><span class="item-price">7 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Куриная грудка в соусе терияки с рисом</span><span class="name-translated" data-en="Chicken breast Teriyaki with rice" data-tr="Teriyaki soslu tavuk göğsü" data-hi="चिकन टेरियाकी" data-de="Hähnchenbrust Teriyaki mit Reis"></span></div><span class="item-price">4 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Куриное филе со шпинатом</span><span class="name-translated" data-en="Chicken fillet with spinach" data-tr="Ispanaklı tavuk fileto" data-hi="पालक चिकन" data-de="Hähnchenbrust mit Spinat"></span></div><span class="item-price">4 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Куриное филе в соусе том ям</span><span class="name-translated" data-en="Chicken in Tom Yum sauce" data-tr="Tom Yum soslu tavuk" data-hi="टॉम यम चिकन" data-de="Hähnchen in Tom-Yam-Soße"></span></div><span class="item-price">4 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Дорадо на картофельной подушке</span><span class="name-translated" data-en="Dorado on potato bed" data-tr="Patates yatağında Çupra" data-hi="डोराडो मछली" data-de="Dorade auf Kartoffelbett"></span></div><span class="item-price">5 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Форель на гриле</span><span class="name-translated" data-en="Grilled trout" data-tr="Izgara alabalık" data-hi="ग्रिल्ड ट्राउट" data-de="Gegrillte Forelle"></span></div><span class="item-price">5 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Креветки в чесночно-сливочном соусе</span><span class="name-translated" data-en="Garlic cream shrimps" data-tr="Sarımsaklı kremalı karides" data-hi="झींगा मलाईदार सॉस" data-de="Garnelen in Knoblauch-Sahne"></span></div><span class="item-price">5 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Лосось со шпинатом в сливочном соусе</span><span class="name-translated" data-en="Salmon with spinach in cream sauce" data-tr="Kremalı ıspanaklı somon" data-hi="सामन पालक सॉस" data-de="Lachs mit Spinat in Sahnesoße"></span></div><span class="item-price">6 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Паста болоньезе</span><span class="name-translated" data-en="Pasta Bolognese" data-tr="Makarna Bolognese" data-hi="पास्ता बोलोनीज़" data-de="Pasta Bolognese"></span></div><span class="item-price">4 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Паста карбонара</span><span class="name-translated" data-en="Pasta Carbonara" data-tr="Makarna Carbonara" data-hi="पास्ता कार्बोनारा" data-de="Pasta Carbonara"></span></div><span class="item-price">4 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Паста альфредо</span><span class="name-translated" data-en="Pasta Alfredo" data-tr="Makarna Alfredo" data-hi="पास्ता अल्फ्रेडो" data-de="Pasta Alfredo"></span></div><span class="item-price">4 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Паста с морепродуктами</span><span class="name-translated" data-en="Seafood pasta" data-tr="Deniz ürünlü makarna" data-hi="सीफूड पास्ता" data-de="Meeresfrüchte-Pasta"></span></div><span class="item-price">4 800тг</span></div>
-        </div>
-
-        <!-- ФАСТ ФУД -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Фаст фуд" data-en="Fast Food" data-tr="Fast Food" data-hi="फास्ट फूड" data-de="Fast Food">Фаст фуд</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Бургер с курицей и фри</span><span class="name-translated" data-en="Chicken burger with fries" data-tr="Tavuklu burger ve patates" data-hi="चिकन बर्गर और फ्राइज़" data-de="Hähnchenburger mit Pommes"></span></div><span class="item-price">2 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Бургер с говядиной и фри</span><span class="name-translated" data-en="Beef burger with fries" data-tr="Etli burger ve patates" data-hi="बीफ बर्गर и फ्राइज़" data-de="Rindburger mit Pommes"></span></div><span class="item-price">3 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Бургер двойной с курицей и фри</span><span class="name-translated" data-en="Double chicken burger & fries" data-tr="Çift tavuklu burger ve patates" data-hi="डबल चिकन बर्गर" data-de="Doppel-Hähnchenburger mit Pommes"></span></div><span class="item-price">3 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Бургер двойной с говядиной и фри</span><span class="name-translated" data-en="Double beef burger & fries" data-tr="Çift etli burger ve patates" data-hi="डबल बीफ बर्गर" data-de="Doppel-Rindburger mit Pommes"></span></div><span class="item-price">3 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Клаб сендвич с курицей</span><span class="name-translated" data-en="Chicken club sandwich" data-tr="Tavuklu kulüp sandviç" data-hi="चिकन क्लब सैंडविच" data-de="Chicken Club Sandwich"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Клаб сендвич с лососем</span><span class="name-translated" data-en="Salmon club sandwich" data-tr="Somonlu kulüp sandviç" data-hi="सामन सैंडविच" data-de="Lachs Club Sandwich"></span></div><span class="item-price">2 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Наггетсы куриные</span><span class="name-translated" data-en="Chicken nuggets" data-tr="Tavuk nugget" data-hi="चिकन नगेट्स" data-de="Chicken Nuggets"></span></div><span class="item-price">1 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Кутабы с тыквой</span><span class="name-translated" data-en="Pumpkin kutab" data-tr="Balkabaklı kutab" data-hi="कद्दू कुताब" data-de="Kutab mit Kürbis"></span></div><span class="item-price">1 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пицца маргарита</span><span class="name-translated" data-en="Pizza Margherita" data-tr="Margarita pizza" data-hi="पिज्जा मार्गेरिटा" data-de="Pizza Margherita"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пицца пепперони</span><span class="name-translated" data-en="Pizza Pepperoni" data-tr="Pepperoni pizza" data-hi="पिज्जा पेपेरोनी" data-de="Pizza Pepperoni"></span></div><span class="item-price">3 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пицца с курицей и грибами</span><span class="name-translated" data-en="Chicken & mushroom pizza" data-tr="Tavuklu mantarlı pizza" data-hi="चिकन पिज्जा" data-de="Pizza Hähnchen & Pilze"></span></div><span class="item-price">3 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пицца четыре сыра</span><span class="name-translated" data-en="Four cheese pizza" data-tr="Dört peynirli pizza" data-hi="फोर चीज़ पिज्जा" data-de="Pizza Vier Käse"></span></div><span class="item-price">3 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Круассан с курицей</span><span class="name-translated" data-en="Chicken croissant" data-tr="Tavuklu kruvasan" data-hi="चिकन क्रॉइसैन" data-de="Hähnchen-Croissant"></span></div><span class="item-price">2 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Круассан с лососем</span><span class="name-translated" data-en="Salmon croissant" data-tr="Somonlu kruvasan" data-hi="सामन क्रॉइसैन" data-de="Lachs-Croissant"></span></div><span class="item-price">2 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Чебурек-великан</span><span class="name-translated" data-en="Giant Chebureki" data-tr="Dev Çiğ börek" data-hi="विशाल चेब्युरेक" data-de="Riesen-Tscheburek"></span></div><span class="item-price">1 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Мини чебуреки с острым соусом</span><span class="name-translated" data-en="Mini Chebureki with spicy sauce" data-tr="Acı soslu mini çiğ börek" data-hi="मिनी चेब्युरेक" data-de="Mini-Tschebureks"></span></div><span class="item-price">1 900тг</span></div>
-        </div>
-
-        <!-- ЗАКУСКИ, ГАРНИРЫ, К ПИВУ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Закуски" data-en="Appetizers" data-tr="Atıştırmalıklar" data-hi="स्टार्टर" data-de="Vorspeisen">Закуски</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Холодец с горчицей</span><span class="name-translated" data-en="Aspic with mustard" data-tr="Hardallı jöle et" data-hi="होलोडेट्स" data-de="Sülze mit Senf"></span></div><span class="item-price">2 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Кавказская нарезка</span><span class="name-translated" data-en="Caucasian platter" data-tr="Kafkas tabağı" data-hi="काकेशस प्लैटर" data-de="Kaukasische Platte"></span></div><span class="item-price">3 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Мозговые косточки запеченные</span><span class="name-translated" data-en="Roasted bone marrow" data-tr="Fırınlanmış ilikli kemik" data-hi="रोस्टेड बोन मैरो" data-de="Gebackenes Knochenmark"></span></div><span class="item-price">3 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Сырное плато</span><span class="name-translated" data-en="Cheese platter" data-tr="Peynir tabağı" data-hi="चीज़ प्लेट" data-de="Käseplatte"></span></div><span class="item-price">4 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Мясное ассорти</span><span class="name-translated" data-en="Meat platter" data-tr="Et tabağı" data-hi="मीट प्लेट" data-de="Fleischplatte"></span></div><span class="item-price">6 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Сырное фондю</span><span class="name-translated" data-en="Cheese fondue" data-tr="Peynir fondü" data-hi="चीज़ फ़ॉन्ड्यू" data-de="Käsefondue"></span></div><span class="item-price">6 900тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="Гарниры" data-en="Side Dishes" data-tr="Garnitürler" data-hi="साइड डिश" data-de="Beilagen">Гарниры</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Хлебная корзина</span><span class="name-translated" data-en="Bread basket" data-tr="Ekmek sepeti" data-hi="ब्रेड टोकरी" data-de="Brotkorb"></span></div><span class="item-price">700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Рис</span><span class="name-translated" data-en="Rice" data-tr="Pirinç" data-hi="चावल" data-de="Reis"></span></div><span class="item-price">1 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Гречка отварная</span><span class="name-translated" data-en="Boiled buckwheat" data-tr="Haşlanmış karabuğday" data-hi="कुट्टू" data-de="Gekochter Buchweizen"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Картофельное пюре</span><span class="name-translated" data-en="Mashed potatoes" data-tr="Patates püresi" data-hi="आलू का भरता" data-de="Kartoffelpüree"></span></div><span class="item-price">1 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Картофель фри</span><span class="name-translated" data-en="French fries" data-tr="Patates kızartması" data-hi="फ़्रेंच फ़्राइज़" data-de="Pommes Frites"></span></div><span class="item-price">1 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Картофель по-деревенски</span><span class="name-translated" data-en="Potato wedges" data-tr="Elma dilim patates" data-hi="पोटैटो वेज" data-de="Kartoffelecken"></span></div><span class="item-price">1 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Овощи-гриль</span><span class="name-translated" data-en="Grilled vegetables" data-tr="Izgara sebzeler" data-hi="ग्रिल्ड सब्जियां" data-de="Gegrilltes Gemüse"></span></div><span class="item-price">1 600тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="К пиву" data-en="Beer Snacks" data-tr="Bira Yanı" data-hi="बियर स्नैक्स" data-de="Biersnacks">К пиву</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Чипсы</span><span class="name-translated" data-en="Chips" data-tr="Cips" data-hi="चिप्स" data-de="Chips"></span></div><span class="item-price">1 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Чечил</span><span class="name-translated" data-en="Chechil cheese" data-tr="Çeçil peyniri" data-hi="चेचिल चीज़" data-de="Tschetschil-Käse"></span></div><span class="item-price">1 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Фисташки</span><span class="name-translated" data-en="Pistachios" data-tr="Fıstık" data-hi="पिस्ता" data-de="Pistazien"></span></div><span class="item-price">1 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Курт</span><span class="name-translated" data-en="Kurt cheese" data-tr="Kurt peyniri" data-hi="कुर्ट" data-de="Kurt-Käse"></span></div><span class="item-price">1 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Гарлики</span><span class="name-translated" data-en="Garlic croutons" data-tr="Sarımsaklı kruton" data-hi="गार्लिक क्रूटॉन" data-de="Knoblauch-Croutons"></span></div><span class="item-price">1 500тг</span></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Вкладка БАР -->
-    <div id="tab-bar" class="tab-content">
-      <div class="menu-grid">
-
-        <!-- БЕЗ АЛКОГОЛЬНЫЕ НАПИТКИ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Без алкогольные напитки" data-en="Non-alcoholic drinks" data-tr="Alkolsüz İçecekler" data-hi="गैर-मादक पेय" data-de="Alkoholfreie Getränke">Без алкогольные напитки</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Bonaqua с/без газа (0,5ml)</span><span class="name-translated" data-en="Bonaqua still/sparkling" data-tr="Bonaqua su" data-hi="बोनाक्वा पानी" data-de="Bonaqua Wasser"></span></div><span class="item-price">900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Bonaqua с/без газа (1L)</span><span class="name-translated" data-en="Bonaqua still/sparkling" data-tr="Bonaqua su" data-hi="बोनाक्वा पानी" data-de="Bonaqua Wasser"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Coca-cola/Fanta/Sprite (0,25ml)</span><span class="name-translated" data-en="Soda" data-tr="Gazoz" data-hi="सोडा" data-de="Limonade"></span></div><span class="item-price">1 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Coca-cola/Fanta/Sprite (1L)</span><span class="name-translated" data-en="Soda" data-tr="Gazoz" data-hi="सोडा" data-de="Limonade"></span></div><span class="item-price">1 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Borjomi (0,33ml)</span><span class="name-translated" data-en="Borjomi" data-tr="Borjomi" data-hi="बोर्जॉमी" data-de="Borjomi"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Borjomi груша/мандарин (0,33ml)</span><span class="name-translated" data-en="Borjomi pear/mandarin" data-tr="Borjomi armut/mandalina" data-hi="बोर्जॉमी स्वाद" data-de="Borjomi Birne/Mandarine"></span></div><span class="item-price">1 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Red bull (0,25ml)</span><span class="name-translated" data-en="Red Bull" data-tr="Red Bull" data-hi="रेड बुल" data-de="Red Bull"></span></div><span class="item-price">1 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Piko яблоко/апельсин (0,20ml)</span><span class="name-translated" data-en="Piko juice apple/orange" data-tr="Piko meyve suyu" data-hi="पिको जूस" data-de="Piko Saft"></span></div><span class="item-price">800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Piko яблоко/апельсин (1L)</span><span class="name-translated" data-en="Piko juice apple/orange" data-tr="Piko meyve suyu" data-hi="पिको जूस" data-de="Piko Saft"></span></div><span class="item-price">1 600тг</span></div>
-        </div>
-
-        <!-- ВИНА И ШАМПАНСКОЕ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Вина" data-en="Wines" data-tr="Şaraplar" data-hi="वाइन" data-de="Weine">Вина</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Долины грузии (красное/белое сухое)</span><span class="name-translated" data-en="Valleys of Georgia" data-tr="Gürcistan Şarabı" data-hi="जॉर्जियन वाइन" data-de="Täler von Georgien"></span></div><span class="item-price">8 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Finca La Blanca Rosado</span><span class="name-translated" data-en="Rosado wine" data-tr="Roze şarap" data-hi="गुलाबी वाइन" data-de="Roséwein"></span></div><span class="item-price">8 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Piccini Familae Bianco</span><span class="name-translated" data-en="White wine" data-tr="Beyaz şarap" data-hi="सफेद वाइन" data-de="Weißwein"></span></div><span class="item-price">9 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Vista Espana</span><span class="name-translated" data-en="Spanish wine" data-tr="İspanyol şarabı" data-hi="स्पैनिश वाइन" data-de="Spanischer Wein"></span></div><span class="item-price">9 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Decordi Pinot Grigio Doc</span><span class="name-translated" data-en="Pinot Grigio" data-tr="Pinot Grigio" data-hi="पिनॉट ग्रिगियो" data-de="Pinot Grigio"></span></div><span class="item-price">12 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Вино по бокалам</span><span class="name-translated" data-en="Wine by glass" data-tr="Kadehte şarap" data-hi="ग्लास वाइन" data-de="Offener Wein"></span></div><span class="item-price">1 800тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="Шампанское" data-en="Champagne" data-tr="Şampanya" data-hi="शैंपेन" data-de="Champagner">Шампанское</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Советское шампанское</span><span class="name-translated" data-en="Soviet champagne" data-tr="Sovyet şampanyası" data-hi="सोवियत शैंपेन" data-de="Sowjetischer Sekt"></span></div><span class="item-price">5 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Lambrusco Dellemilia</span><span class="name-translated" data-en="Lambrusco" data-tr="Lambrusco" data-hi="लैम्ब्रूस्को" data-de="Lambrusco"></span></div><span class="item-price">8 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Martini Asti</span><span class="name-translated" data-en="Martini Asti" data-tr="Martini Asti" data-hi="मार्टिनी अस्टी" data-de="Martini Asti"></span></div><span class="item-price">15 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Prosecco Perlino</span><span class="name-translated" data-en="Prosecco" data-tr="Prosecco" data-hi="प्रोसेको" data-de="Prosecco"></span></div><span class="item-price">15 000тг</span></div>
-        </div>
-
-        <!-- КОКТЕЙЛИ И ЛИМОНАДЫ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Коктейли и Смузи" data-en="Cocktails & Smoothies" data-tr="Kokteyller ve Smoothie" data-hi="कॉकटेल और स्मूदी" data-de="Cocktails & Smoothies">Коктейли и Смузи</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Mojito (alcohol)</span><span class="name-translated" data-en="Mojito" data-tr="Mojito" data-hi="मोहितो" data-de="Mojito"></span></div><span class="item-price">2 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Long Island iced tea</span><span class="name-translated" data-en="Long Island" data-tr="Long Island" data-hi="लॉन्ग आइलैंड" data-de="Long Island"></span></div><span class="item-price">2 900тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Aperol spritz</span><span class="name-translated" data-en="Aperol Spritz" data-tr="Aperol Spritz" data-hi="एपрол स्प्रिट्ज़" data-de="Aperol Spritz"></span></div><span class="item-price">3 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Молочный коктейль</span><span class="name-translated" data-en="Milkshake" data-tr="Milkshake" data-hi="मिल्कशेक" data-de="Milchshake"></span></div><span class="item-price">1 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Смузи ананас-апельсин</span><span class="name-translated" data-en="Pineapple-orange smoothie" data-tr="Ananas-portakal smoothie" data-hi="स्मूदी" data-de="Ananas-Orangen-Smoothie"></span></div><span class="item-price">2 300тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Смузи банан-киви</span><span class="name-translated" data-en="Banana-kiwi smoothie" data-tr="Muz-kivi smoothie" data-hi="स्मूदी" data-de="Bananen-Kiwi-Smoothie"></span></div><span class="item-price">2 300тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="Лимонады" data-en="Limonades" data-tr="Limonatalar" data-hi="शिकंजी" data-de="Limonaden">Лимонады</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Манго-маракуйя</span><span class="name-translated" data-en="Mango-passion fruit" data-tr="Mango-çarkıfelek" data-hi="आम और पैशन फ्रूट" data-de="Mango-Passionsfrucht"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Мохито</span><span class="name-translated" data-en="Mojito lemonade" data-tr="Mojito limonata" data-hi="मोहितो" data-de="Mojito-Limonade"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Яблоко-киви</span><span class="name-translated" data-en="Apple-kiwi" data-tr="Elma-kivi" data-hi="себ и киви" data-de="Apfel-Kiwi"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ягодный</span><span class="name-translated" data-en="Berry lemonade" data-tr="Orman meyveli" data-hi="बेरी" data-de="Beeren-Limonade"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Лимонад в стаканчике</span><span class="name-translated" data-en="Lemonade by cup" data-tr="Bardakta limonata" data-hi="гласс лемонед" data-de="Limonade im Glas"></span></div><span class="item-price">1 200тг</span></div>
-        </div>
-
-        <!-- ЧАЙ И КОФЕ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Чай" data-en="Tea" data-tr="Çay" data-hi="चाय" data-de="Tee">Чай</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Зеленый/черный чай</span><span class="name-translated" data-en="Green/Black tea" data-tr="Yeşil/Siyah çay" data-hi="हरी/काली चाय" data-de="Grüner/Schwarzer Tee"></span></div><span class="item-price">400 / 1 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Зеленый/черный (молоко/лимон)</span><span class="name-translated" data-en="Tea with milk/lemon" data-tr="Sütlü/Limonlu çay" data-hi="दूध/नींबू चाय" data-de="Tee mit Milch/Zitrone"></span></div><span class="item-price">500 / 1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Турецкий чай</span><span class="name-translated" data-en="Turkish tea" data-tr="Türk çayı" data-hi="टर्किश चाय" data-de="Türkischer Tee"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Марокканский чай</span><span class="name-translated" data-en="Moroccan tea" data-tr="Fas çayı" data-hi="मोरक्कन चाय" data-de="Marokkanischer Tee"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ташкентский чай</span><span class="name-translated" data-en="Tashkent tea" data-tr="Taşkent çayı" data-hi="ताशकंद चाय" data-de="Taschkent Tee"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ягодный чай</span><span class="name-translated" data-en="Berry tea" data-tr="Meyve çayı" data-hi="बेरी चाय" data-de="Beerentee"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Облепиховый чай</span><span class="name-translated" data-en="Sea buckthorn tea" data-tr="Çiriş otu çayı" data-hi="समुद्री हिरण चाय" data-de="Sanddorntee"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ice tea</span><span class="name-translated" data-en="Ice tea" data-tr="Buzlu çay" data-hi="आइस टी" data-de="Eistee"></span></div><span class="item-price">1 200тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="Кофе" data-en="Coffee" data-tr="Kahve" data-hi="कॉफी" data-de="Kaffee">Кофе</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Esspresso (0,03ml)</span><span class="name-translated" data-en="Espresso" data-tr="Espresso" data-hi="एस्प्रेसो" data-de="Espresso"></span></div><span class="item-price">1 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Americano (0,250ml)</span><span class="name-translated" data-en="Americano" data-tr="Americano" data-hi="अमेरिकानो" data-de="Americano"></span></div><span class="item-price">1 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Capuchino (0,250ml)</span><span class="name-translated" data-en="Cappuccino" data-tr="Kapuçino" data-hi="कैपुचिनो" data-de="Cappuccino"></span></div><span class="item-price">1 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Latte (0,250ml)</span><span class="name-translated" data-en="Latte" data-tr="Latte" data-hi="लैट्टे" data-de="Latte"></span></div><span class="item-price">1 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Флэт уайт</span><span class="name-translated" data-en="Flat white" data-tr="Flat white" data-hi="फ्लैट व्हाइट" data-de="Flat White"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Раф</span><span class="name-translated" data-en="Raf coffee" data-tr="Raf coffee" data-hi="राफ कॉफी" data-de="Raf Kaffee"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Фрапучино</span><span class="name-translated" data-en="Frappuccino" data-tr="Frappuccino" data-hi="फ्रैपुचिनो" data-de="Frappuccino"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ice coffee</span><span class="name-translated" data-en="Ice coffee" data-tr="Buzlu kahve" data-hi="आइस कॉफी" data-de="Eiskaffee"></span></div><span class="item-price">1 600тг</span></div>
-        </div>
-
-        <!-- КРЕПКИЙ АЛКОГОЛЬ И ПИВО -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Пиво" data-en="Beer" data-tr="Bira" data-hi="बियर" data-de="Bier">Пиво</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Bavaria</span><span class="name-translated" data-en="Bavaria" data-tr="Bavaria" data-hi="बवेरिया" data-de="Bavaria"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Miller</span><span class="name-translated" data-en="Miller" data-tr="Miller" data-hi="मिलर" data-de="Miller"></span></div><span class="item-price">1 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Efes</span><span class="name-translated" data-en="Efes" data-tr="Efes" data-hi="इफिस" data-de="Efes"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Efes 0.0</span><span class="name-translated" data-en="Efes 0.0" data-tr="Efes 0.0" data-hi="इफिस 0.0" data-de="Efes 0.0"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Corona extra</span><span class="name-translated" data-en="Corona extra" data-tr="Corona extra" data-hi="कोरोना एक्स्ट्रा" data-de="Corona Extra"></span></div><span class="item-price">2 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Efes (разливное)</span><span class="name-translated" data-en="Efes draft" data-tr="Efes fıçı" data-hi="इफिस ड्राफ्ट" data-de="Efes vom Fass"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Кружка свежего (разливное)</span><span class="name-translated" data-en="Fresh draft beer" data-tr="Taze fıçı bira" data-hi="ताज़ा बियर" data-de="Frisches Fassbier"></span></div><span class="item-price">1 600тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="Водка, Виски, Коньяк" data-en="Strong Spirits" data-tr="Sert Alkollü" data-hi="हार्ड ड्रिंक्स" data-de="Spirituosen">Водка / Виски / Коньяк</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Kyzylzhar premium (0,05ml)</span><span class="name-translated" data-en="Vodka Kyzylzhar" data-tr="Votka Kyzylzhar" data-hi="वोदका" data-de="Wodka"></span></div><span class="item-price">1 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Русский стандарт (0,05ml)</span><span class="name-translated" data-en="Russian Standard" data-tr="Russian Standard" data-hi="रूसी मानक" data-de="Russian Standard"></span></div><span class="item-price">1 200тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Absolut (0,05ml)</span><span class="name-translated" data-en="Absolut Vodka" data-tr="Absolut Votka" data-hi="ऐब्सलूट" data-de="Absolut"></span></div><span class="item-price">1 400тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ballantine's (0,05ml)</span><span class="name-translated" data-en="Ballantine's" data-tr="Ballantine's" data-hi="बालेंटाइन्स" data-de="Ballantine's"></span></div><span class="item-price">1 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Jameson (0,05ml)</span><span class="name-translated" data-en="Jameson" data-tr="Jameson" data-hi="जेमसन" data-de="Jameson"></span></div><span class="item-price">2 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Chivas regal 12 y.o. (0,05ml)</span><span class="name-translated" data-en="Chivas Regal 12" data-tr="Chivas Regal 12" data-hi="शिवास रीगल" data-de="Chivas Regal 12"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Казахстанский 3* (0,05ml)</span><span class="name-translated" data-en="Kazakhstan Cognac 3*" data-tr="Kazakistan Konyak 3*" data-hi="कज़ाख कोन्याक 3*" data-de="Kasachstan Weinbrand 3*"></span></div><span class="item-price">1 500тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Казахстанский 5* (0,05ml)</span><span class="name-translated" data-en="Kazakhstan Cognac 5*" data-tr="Kazakistan Konyak 5*" data-hi="कज़ाख कोन्याक 5*" data-de="Kasachstan Weinbrand 5*"></span></div><span class="item-price">1 600тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Ararat 5* (0,05ml)</span><span class="name-translated" data-en="Ararat Cognac 5*" data-tr="Ararat Konyak 5*" data-hi="अराफात कोन्याक" data-de="Ararat Weinbrand 5*"></span></div><span class="item-price">1 900тг</span></div>
-        </div>
-
-        <!-- ДЕСЕРТЫ И СИГАРЕТЫ -->
-        <div class="category">
-          <h3 class="category-title" data-ru="Десерты" data-en="Desserts" data-tr="Tatlılar" data-hi="डेज़र्ट" data-de="Desserts">Десерты</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пахлава маленькая/большая</span><span class="name-translated" data-en="Baklava small/big" data-tr="Baklava küçük/büyük" data-hi="बकलावा" data-de="Baklava klein/groß"></span></div><span class="item-price">990 / 1 700тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пахлава с мороженым</span><span class="name-translated" data-en="Baklava with ice cream" data-tr="Dondurmalı baklava" data-hi="बकलावा आइसक्रीम के साथ" data-de="Baklava mit Eis"></span></div><span class="item-price">2 100тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пирожное Сникерс</span><span class="name-translated" data-en="Snickers cake" data-tr="Snickers pasta" data-hi="स्निकर्स केक" data-de="Snickers-Kuchen"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пирожное Сан-Себастьян</span><span class="name-translated" data-en="San Sebastian cheesecake" data-tr="San Sebastian cheesecake" data-hi="सैन सेबेस्टियन केक" data-de="San-Sebastian-Kuchen"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пирожное Орео</span><span class="name-translated" data-en="Oreo cake" data-tr="Oreo pasta" data-hi="ओरियो केक" data-de="Oreo-Kuchen"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пирожное Тирамису</span><span class="name-translated" data-en="Tiramisu cake" data-tr="Tiramisu" data-hi="तिरामिसु" data-de="Tiramisu"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Пирожное Брауни</span><span class="name-translated" data-en="Brownie cake" data-tr="Brownie" data-hi="ब्राउनी" data-de="Brownie"></span></div><span class="item-price">2 800тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Шоколадное фондю (маленькое/большое)</span><span class="name-translated" data-en="Chocolate fondue (S/L)" data-tr="Çikolata fondü (K/B)" data-hi="चॉकलेट फ़ॉन्ड्यू" data-de="Schokoladenfondue (K/G)"></span></div><span class="item-price">3 500 / 6 500тг</span></div>
-        </div>
-
-        <div class="category">
-          <h3 class="category-title" data-ru="Сигареты" data-en="Tobacco" data-tr="Tütün" data-hi="सिगरेट" data-de="Tabakwaren">Сигареты</h3>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Parlament Reserve</span><span class="name-translated" data-en="Cigarettes" data-tr="Sigara" data-hi="सिगरेट" data-de="Zigaretten"></span></div><span class="item-price">2 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Esse exchange</span><span class="name-translated" data-en="Cigarettes" data-tr="Sigara" data-hi="सिगरेट" data-de="Zigaretten"></span></div><span class="item-price">2 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Richmond red edition</span><span class="name-translated" data-en="Cigarettes" data-tr="Sigara" data-hi="सिगरेट" data-de="Zigaretten"></span></div><span class="item-price">2 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Terea</span><span class="name-translated" data-en="Tobacco sticks" data-tr="Tütün çubuğu" data-hi="तंबाकू" data-de="Tabaksticks"></span></div><span class="item-price">2 000тг</span></div>
-          <div class="menu-item"><div class="item-names"><span class="name-ru">Зажигалка</span><span class="name-translated" data-en="Lighter" data-tr="Çakmak" data-hi="लाइटर" data-de="Feuerzeug"></span></div><span class="item-price">500тг</span></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Футер -->
-    <div class="footer-note" id="footer-text">
-      Обслуживание - 10%<br>Если у вас есть аллергия на какие-либо продукты, пожалуйста, сообщите об этом официанту.
-    </div>
-
+  <!-- Список блюд -->
+  <div class="menu-container" id="menu-items">
+    <!-- Элементы создаются автоматически через JavaScript -->
   </div>
 
   <script>
+    // База данных блюд
+    const menuData = [
+      {
+        kzt: 4800,
+        ru: { title: "Паста Карбонара", desc: "Классическая паста с панчеттой, пармезаном и яичным желтком" },
+        en: { title: "Pasta Carbonara", desc: "Classic pasta with pancetta, parmesan, and egg yolk" },
+        it: { title: "Pasta alla Carbonara", desc: "Pasta classica con pancetta, parmigiano e tuorlo d'uovo" },
+        zh: { title: "奶油培根面", desc: "经典意面，配意大利培根、帕玛森芝士和蛋黄" }
+      },
+      {
+        kzt: 5200,
+        ru: { title: "Пицца Маргарита с Бурратой", desc: "Томатный соус, свежая буррата, базилик и оливковое масло" },
+        en: { title: "Margherita Pizza with Burrata", desc: "Tomato sauce, fresh burrata, basil, and olive oil" },
+        it: { title: "Pizza Margherita con Burrata", desc: "Salsa di pomodoro, burrata fresca, basilico e olio d'oliva" },
+        zh: { title: "玛格丽特布拉塔比萨", desc: "番茄酱、新鲜布拉塔芝士、罗勒和橄榄油" }
+      },
+      {
+        kzt: 3500,
+        ru: { title: "Тирамису Классический", desc: "Традиционный итальянский десерт с маскарпоне и кофе" },
+        en: { title: "Classic Tiramisu", desc: "Traditional Italian dessert with mascarpone and espresso" },
+        it: { title: "Tiramisu Classico", desc: "Dolce tradizionale italiano con mascarpone e caffe" },
+        zh: { title: "经典提拉米苏", desc: "传统的意大利甜点，配马斯卡彭芝士和咖啡" }
+      }
+    ];
+
+    const currencyConfig = {
+      en: { rate: 0.0021, symbol: "$" },
+      it: { rate: 0.0019, symbol: "€" },
+      zh: { rate: 0.015,  symbol: "¥" }
+    };
+
     let currentLang = 'en';
+
+    function renderMenu() {
+      const container = document.getElementById('menu-items');
+      const config = currencyConfig[currentLang];
+      
+      container.innerHTML = menuData.map(item => {
+        const foreignPrice = (item.kzt * config.rate).toFixed(2);
+        const langData = item[currentLang];
+
+        return `
+          <div class="menu-item">
+            <div class="item-info">
+              <span class="title-translated">${langData.title}</span>
+              <span class="title-ru">${item.ru.title}</span>
+              <p class="desc-translated">${langData.desc}</p>
+              <p class="desc-ru">${item.ru.desc}</p>
+            </div>
+            <div class="price-box">
+              <span class="price-foreign">${config.symbol} ${foreignPrice}</span>
+              <span class="price-kzt">${item.kzt.toLocaleString()} ₸</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
     function setLanguage(lang) {
       currentLang = lang;
-      
-      document.getElementById('lang-modal').style.display = 'none';
-      document.getElementById('menu-page').style.display = 'block';
-
-      document.querySelectorAll('.category-title').forEach(el => {
-        const trans = el.getAttribute('data-' + lang);
-        const ruText = el.getAttribute('data-ru');
-        if (trans) {
-          el.textContent = `${ruText} / ${trans}`;
-        }
-      });
-
-      document.querySelectorAll('.name-translated').forEach(el => {
-        const trans = el.getAttribute('data-' + lang);
-        if (trans) {
-          el.textContent = trans;
-        }
-      });
-    }
-
-    function resetLanguage() {
-      document.getElementById('menu-page').style.display = 'none';
-      document.getElementById('lang-modal').style.display = 'flex';
-    }
-
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
-
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      document.getElementById('tab-' + tabName).classList.add('active');
+      renderMenu();
     }
+
+    // Инициализация при загрузке
+    renderMenu();
   </script>
 </body>
 </html>
